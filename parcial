@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Turístico del Perú</title>
+    <style>
+        :root {
+            --color-fondo-principal: #E0F7FA; 
+            --color-barra-lateral: #1A237E; 
+            --color-texto-claro: #FFFFFF;
+            --color-texto-oscuro: #263238; 
+            --color-resaltado-azul: #007bff; 
+            --color-cajas-fondo: #FFFFFF;
+            --color-borde-gris: #B0BEC5; 
+            --color-gris-claro-placeholder: #CFD8DC;
+            --color-gris-oscuro-placeholder: #78909C;
+            --color-footer-background: #1A237E; 
+            --color-footer-text: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--color-fondo-principal);
+            display: flex;
+            min-height: 100vh;
+        }
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: none;
+            height: 100vh;
+            background-color: var(--color-fondo-principal);
+            border-radius: 0;
+            overflow: hidden;
+            box-shadow: none;
+        }
+
+        .sidebar {
+            width: 300px;
+            background-color: var(--color-barra-lateral);
+            padding: 25px 0;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-right: 2px solid rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .menu-header {
+            font-weight: bold;
+            font-size: 1.8em;
+            margin-bottom: 50px;
+            color: var(--color-texto-claro);
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .menu-options ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .menu-options li {
+            width: 90%;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            box-sizing: border-box;
+        }
+
+        .menu-options a {
+            display: block;
+            padding: 18px 0;
+            text-decoration: none;
+            color: var(--color-texto-claro);
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            text-align: center;
+        }
+        .menu-options a:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: scale(1.02);
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 35px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            background-color: var(--color-fondo-principal);
+            margin-left: 300px;
+            width: calc(100% - 300px);
+        }
+
+        .page {
+            width: 100%;
+            display: none;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: var(--color-fondo-principal);
+            overflow-y: auto;
+        }
+
+        .page.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            flex-grow: 1;
+        }
+
+        .page-title {
+            font-size: 2.8em;
+            font-weight: bold;
+            margin-bottom: 50px;
+            text-align: center;
+            width: 100%;
+            color: var(--color-barra-lateral);
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.15);
+        }
+        .dashboard-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 1100px;
+            gap: 45px;
+        }
+
+        .info-cards-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            width: 100%;
+            margin-bottom: 35px;
+            gap: 30px;
+        }
+
+        .info-card {
+            background-color: var(--color-cajas-fondo);
+            padding: 30px 40px;
+            border-radius: 15px;
+            text-align: center;
+            color: var(--color-texto-oscuro);
+            flex: 1;
+            min-width: 220px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+        .info-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .info-label {
+            font-weight: bold;
+            font-size: 1.3em;
+            margin-bottom: 12px;
+            color: var(--color-resaltado-azul);
+        }
+
+        .info-value {
+            font-size: 2.4em;
+            font-weight: bold;
+            color: var(--color-texto-oscuro);
+        }
+        .summary-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 1100px;
+            gap: 35px;
+        }
+
+        .large-image-placeholder {
+            width: 100%;
+            height: 400px; 
+            background-color: var(--color-gris-claro-placeholder);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--color-texto-claro);
+            font-size: 1.8em;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .large-image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto;
+        }
+        .history-text-area {
+            width: 100%;
+            background-color: var(--color-cajas-fondo);
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            line-height: 1.8;
+            font-size: 1.15em;
+            color: var(--color-texto-oscuro);
+            text-align: justify;
+        }
+        .form-section {
+            width: 90%;
+            max-width: 800px;
+            background-color: var(--color-cajas-fondo);
+            padding: 50px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            color: var(--color-texto-oscuro);
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 15px;
+            border: 1px solid var(--color-borde-gris);
+            border-radius: 8px;
+            background-color: #f8f8f8;
+            color: var(--color-texto-oscuro);
+            font-size: 1.05em;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #999;
+        }
+
+        .send-button {
+            background-color: var(--color-resaltado-azul);
+            color: var(--color-texto-claro);
+            padding: 18px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 25px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .send-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+        }
+        .team-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 50px;
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 25px;
+        }
+
+        .team-card {
+            background-color: var(--color-cajas-fondo);
+            padding: 30px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 18px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+        .team-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .team-image-placeholder {
+            width: 180px;
+            height: 180px;
+            background-color: var(--color-gris-oscuro-placeholder);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        .team-image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .team-text {
+            color: var(--color-texto-oscuro);
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .tourist-places-section {
+            width: 100%;
+            max-width: 1100px;
+            background-color: var(--color-cajas-fondo);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .tourist-places-section h3 {
+            font-size: 1.8em;
+            color: var(--color-barra-lateral);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .tourist-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .tourist-table th, .tourist-table td {
+            border: 1px solid var(--color-borde-gris);
+            padding: 12px;
+            text-align: left;
+            color: var(--color-texto-oscuro);
+        }
+
+        .tourist-table th {
+            background-color: var(--color-resaltado-azul);
+            color: var(--color-texto-claro);
+            font-weight: bold;
+        }
+
+        .tourist-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .tourist-item {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--color-borde-gris);
+        }
+        .tourist-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .tourist-item img {
+            width: 250px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .tourist-details {
+            flex-grow: 1;
+        }
+
+        .tourist-details h4 {
+            font-size: 1.5em;
+            color: var(--color-barra-lateral);
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .tourist-details p {
+            font-size: 1em;
+            line-height: 1.6;
+            color: var(--color-texto-oscuro);
+        }
+
+        .list-section {
+            width: 100%;
+            max-width: 1100px;
+            background-color: var(--color-cajas-fondo);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .list-section h3 {
+            font-size: 1.8em;
+            color: var(--color-barra-lateral);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .list-section ul, .list-section ol {
+            padding-left: 25px;
+            color: var(--color-texto-oscuro);
+            font-size: 1.1em;
+            line-height: 1.7;
+        }
+        .list-section li {
+            margin-bottom: 8px;
+        }
+
+        .multimedia-section {
+            width: 100%;
+            max-width: 1100px;
+            background-color: var(--color-cajas-fondo);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .multimedia-section h3 {
+            font-size: 1.8em;
+            color: var(--color-barra-lateral);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .video-container {
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 16 / 9; 
+            background-color: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .audio-container {
+            width: 100%;
+            max-width: 600px;
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .audio-container p {
+            font-size: 1.1em;
+            color: var(--color-texto-oscuro);
+            margin: 0;
+        }
+
+        .audio-container audio {
+            width: 100%;
+        }
+
+        .site-footer {
+            width: 100%;
+            padding: 20px;
+            background-color: var(--color-footer-background);
+            color: var(--color-footer-text);
+            text-align: center;
+            font-size: 0.9em;
+            margin-top: auto; 
+            box-sizing: border-box;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        .site-footer p {
+            margin: 5px 0;
+        }
+
+
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 250px;
+            }
+            .content {
+                margin-left: 250px;
+                width: calc(100% - 250px);
+            }
+            .page-title {
+                font-size: 2.2em;
+            }
+            .info-card {
+                min-width: 180px;
+            }
+            .tourist-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            .tourist-item img {
+                width: 100%;
+                max-width: 300px;
+                height: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding-bottom: 0;
+                border-right: none;
+            }
+            .menu-options ul {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .menu-options li {
+                width: 45%;
+                margin: 10px;
+            }
+            .content {
+                margin-left: 0;
+                width: 100%;
+                padding-top: 20px;
+            }
+            .container {
+                flex-direction: column;
+            }
+            .team-section {
+                grid-template-columns: 1fr;
+            }
+            .info-cards-container {
+                flex-direction: column;
+            }
+            .form-section, .tourist-places-section, .list-section, .multimedia-section {
+                padding: 25px;
+            }
+            .page-title {
+                font-size: 1.8em;
+                margin-bottom: 30px;
+            }
+        }
+        @media (max-width: 480px) {
+            .menu-options li {
+                width: 90%;
+            }
+            .form-section, .tourist-places-section, .list-section, .multimedia-section {
+                padding: 15px;
+            }
+            .page-title {
+                font-size: 1.5em;
+            }
+            .info-label {
+                font-size: 1.1em;
+            }
+            .info-value {
+                font-size: 2em;
+            }
+            .history-text-area, .tourist-details p, .list-section ul, .list-section ol {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="menu-header">Menú Turístico</div>
+            <nav class="menu-options">
+                <ul>
+                    <li><a href="#" onclick="showPage('inicio')">Inicio</a></li>
+                    <li><a href="#" onclick="showPage('lugares-turisticos')">Lugares Turísticos</a></li>
+                    <li><a href="#" onclick="showPage('multimedia')">Multimedia</a></li>
+                    <li><a href="#" onclick="showPage('solicitud')">Contacto</a></li>
+                    <li><a href="#" onclick="showPage('equipo')">Nuestro Equipo</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <div id="inicio" class="page active">
+                <header class="page-title">Bienvenidos a nuestro portal turistico del Perú</header>
+                <section class="summary-section">
+                    <div class="large-image-placeholder">
+                        <img src="Recursos/WhatsApp Image 2025-06-05 at 9.50.54 AM.jpeg" alt="Vista panorámica de los lugares-turisticos">
+                    </div>
+                    <div class="history-text-area">
+                        <p>
+                            Bienvenidos, tu puerta de entrada a un país de contrastes, misterios ancestrales y paisajes que quitan el aliento. Perú, la cuna de civilizaciones milenarias y hogar de una biodiversidad inigualable, te espera para ofrecerte una experiencia de viaje inigualable. 
+                        </p>
+                        <p>
+                            Sumérgete en la enigmática historia del Imperio Inca visitando la majestuosa ciudadela de Machu Picchu, maravilla del mundo moderno y testimonio de una ingeniería prodigiosa. Recorre los caminos ancestrales del Valle Sagrado, donde la cultura andina sigue viva en sus pueblos y tradiciones.
+                        </p>
+                        <p>
+                            Pero Perú es mucho más que sus ruinas incas. Déjate seducir por la vibrante capital, Lima, capital gastronómica de Sudamérica, donde la tradición y la modernidad se fusionan en una explosión de sabores. Explora la mística Amazonía, hogar de una flora y fauna exuberantes, y descubre la esencia de la vida salvaje. Navega por las misteriosas Líneas de Nazca, un enigma grabado en el desierto. Aventúrate en los cañones profundos de Arequipa, la "Ciudad Blanca", y déjate maravillar por la belleza colonial y volcánica.
+                        </p>
+                        <p>
+                            Te ofrecemos guías completas, itinerarios personalizados, consejos de viaje y toda la información necesaria para que tu aventura en Perú sea perfecta. Desde las alturas de los Andes hasta las costas del Pacífico y la profundidad de la selva, cada rincón de nuestro país te dejará un recuerdo imborrable.
+                        </p>
+                    </div>
+                </section>
+                <footer class="site-footer">
+                    <p>&copy; 2025 Portal Turístico del Perú. Todos los derechos reservados.</p>
+                    <p>Creado por UNIVERSIDAD CÉSAR VALLEJO para el curso de Diseño Web.</p>
+                </footer>
+            </div>
+
+            <div id="lugares-turisticos" class="page">
+                <header class="page-title">Principales Lugares Turísticos del Perú</header>
+                <section class="tourist-places-section">
+                    <h3>Sitios Imperdibles en el Perú </h3>
+                    <table class="tourist-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre del Sitio</th>
+                                <th>Ubicación Principal</th>
+                                <th>Tipo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Machu Picchu</td>
+                                <td>La Ciudad de Cuzco</td>
+                                <td>Ciudadela Inca</td>
+                            </tr>
+                            <tr>
+                                <td>Ica</td>
+                                <td>La Huacachina</td>
+                                <td>La ciudad del eterno sol</td>
+                            </tr>
+                            <tr>
+                                <td>Tarapoto</td>
+                                <td>Laguna azul</td>
+                                <td>Ciudad de las Palmeras</td>
+                            </tr>
+                            <tr>
+                                <td>Arequipa</td>
+                                <td>La ciudad de arequipa</td>
+                                <td>Ciudad Blanca</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Descubre más sobre cada lugar:</h3>
+                    <div class="tourist-item">
+                        <img src="Recursos/images (2).jpeg" alt="Machu Picchu">
+                        <div class="tourist-details">
+                            <h4>Machu Picchu</h4>
+                            <p>
+                                La ciudadela inca de Machu Picchu es una obra maestra de ingeniería y arquitectura, considerada una de las Siete Maravillas del Mundo. Sus intrincadas construcciones de piedra, sus terrazas agrícolas y su ubicación mística entre las montañas la convierten en un destino imperdible para cualquier viajero. 
+                            </p>
+                        </div>
+                    </div>
+                    <div class="tourist-item">
+                        <img src="Recursos/image.jpeg" alt="Ica">
+                        <div class="tourist-details">
+                            <h4>Ica</h4>
+                            <p>
+                                Ica es una ciudad del suroeste del Perú, capital del departamento de Ica, situada en el estrecho valle que forma el río Ica, entre el Gran Tablazo de Ica y las laderas occidentales de la cordillera de los Andes. La ciudad de Ica incluye cinco distritos urbanos.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="tourist-item">
+                        <img src="Recursos/cruzando-el-rio-en-la.jpg" alt="Tarapoto">
+                        <div class="tourist-details">
+                            <h4>Tarapoto</h4>
+                            <p>
+                                Tarapoto es una ciudad peruana de la región de San Martín, que se caracteriza por el bosque nuboso amazónico y sus abundantes palmeras. Es conocida por las numerosas cascadas en las selvas circundantes, incluidas Ahuashiyacu, Huacamaíllo y Shapaja. Al sureste de la ciudad, las aguas claras del lago Lindo y la laguna Sauce más grande (también llamada Laguna Azul) están rodeadas de densos bosques verdes con abundantes especies de aves.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="tourist-item">
+                        <img src="Recursos/177d10b5f372090fba342ca1a2891859.jpeg" alt="Arequipa">
+                        <div class="tourist-details">
+                            <h4>Arequipa</h4>
+                            <p>
+                                Arequipa es la capital de la época colonial de la región de Arequipa en Perú. La rodean 3 volcanes y cuenta con edificios barrocos construidos de sillar, una piedra volcánica blanca. En su centro histórico, se encuentra la Plaza de Armas, una imponente plaza principal, y al norte de ella está la Basílica Catedral neoclásica del siglo XVII, que alberga un museo donde se exhiben obras de arte y objetos religiosos.
+                            </p>
+                        </div>
+                    </div>
+
+                    <h3>Actividades Recomendadas en Cusco:</h3>
+                    <ul class="activities-list">
+                        <li>Visitar el Barrio de San Blas, conocido por sus artesanos.</li>
+                        <li>Recorrer el Mercado Central de San Pedro para probar la gastronomía local.</li>
+                        <li>Explorar las ruinas de Ollantaytambo y Pisac en el Valle Sagrado.</li>
+                        <li>Realizar la caminata a la Montaña de Colores (Vinicunca).</li>
+                    </ul>
+                    <h3>Actividades Recomendadas en Ica:</h3>
+                    <ul class="activities-list">
+                        <li>Paseo en buggy y sandboarding en Huacachina.</li>
+                        <li>Vive la adrenalina en las dunas y prueba el sandboarding.</li>
+                        <li>Tour en bote a las Islas Ballestas para ver lobos marinos, aves y pingüinos.</li>
+                        <li>Degusta pisco y vino en bodegas como Tacama, El Catador o Vista Alegre.</li>
+                    </ul>
+                    <h3>Actividades Recomendadas en Tarapoto:</h3>
+                    <ul class="activities-list">
+                        <li>Relajación, kayak, motos acuáticas, paseos en bote.</li>
+                        <li>Tour al Alto Mayo (Moyobamba y Rioja).</li>
+                        <li>Paseo en Laguna Azul (Sauce).</li>
+                        <li>Visita a comunidades nativas.</li>
+                    </ul>
+                    <h3>Actividades Recomendadas en Arequipa:</h3>
+                    <ul class="activities-list">
+                        <li>Recorrido por el Centro Histórico.</li>
+                        <li>Miradores de Yanahuara y Carmen Alto.</li>
+                        <li>Valle del Colca.</li>
+                        <li>Ruta del Sillar.</li>
+                    </ul>
+
+                    <h3>Consejos para tu Viaje:</h3>
+                    <ol class="tips-list">
+                        <li>Aclimatarse a la altura antes de realizar actividades intensas.</li>
+                        <li>Probar la gastronomía local: cuy chactado, chicha morada.</li>
+                        <li>Llevar ropa abrigadora y protector solar.</li>
+                        <li>Reservar tours y alojamientos con anticipación, especialmente en temporada alta.</li>
+                    </ol>
+                </section>
+            </div>
+
+            <div id="multimedia" class="page">
+                <header class="page-title">Galería Multimedia de los lugares turisticos</header>
+                <section class="multimedia-section">
+                    <h3>Video de los sitios turisticos</h3>
+                    <div class="video-container">
+                        <video controls poster="https://static.vecteezy.com/system/resources/thumbnails/004/640/252/small/circle-button-play-isolated-on-white-background-vector.jpg">
+                            <source src="Recursos/videoplayback (1).mp4" type="video/mp4">
+                            Tu navegador no soporta la etiqueta de video.
+                        </video>
+                    </div>
+                    <h3>Sonidos de los luagres turistico</h3>
+                    <div class="audio-container">
+                        <p>Escucha un sonido ambiente de la cultura peruana:</p>
+                        <audio controls>
+                            <source src="Recursos/sonido de fondo.mpeg" type="audio/mpeg">
+                            Tu navegador no soporta el elemento de audio.
+                        </audio>
+                    </div>
+                    <div class="audio-container">
+                        <p>Sonido de la plaza de armas de Cuzco:</p>
+                        <audio controls>
+                            <source src="Recursos/🇵🇪 PLAZA DE ARMAS DE CUSCO  EN DIRECTO  Machu Picchu  Perú Vip - PERÚ VIP • Agencia de Viajes (mp3cut.net).mp3" type="audio/mp3">
+                            Tu navegador no soporta el elemento de audio.
+                        </audio>
+                    </div>
+                </section>
+            </div>
+
+            <div id="solicitud" class="page">
+                <header class="page-title">Planifica Tu Viaje: Contáctanos</header>
+                <section class="form-section">
+                    <form>
+                        <div class="form-group">
+                            <label for="nombre">Nombre Completo:</label>
+                            <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre completo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="correo">Correo Electrónico:</label>
+                            <input type="email" id="correo" name="correo" placeholder="ejemplo@dominio.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="telefono">Número de Teléfono:</label>
+                            <input type="tel" id="telefono" name="telefono" placeholder="Ej: +51 987654321" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="interes">Interés en:</label>
+                            <select id="interes" name="interes" required>
+                                <option value="">Selecciona una opción</option>
+                                <option value="informacion">Solicitar más información</option>
+                                <option value="tour">Reservar un tour</option>
+                                <option value="personalizado">Viaje personalizado</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="comentarios">Mensaje o Comentarios:</label>
+                            <textarea id="comentarios" name="comentarios" placeholder="Escribe tus preguntas o detalles de tu tour deseado..." rows="6" required></textarea>
+                        </div>
+                        <button type="submit" class="send-button">Enviar Solicitud</button>
+                    </form>
+                </section>
+            </div>
+            <div id="equipo" class="page">
+                <header class="page-title">Nuestro Equipo de Desarrollo</header>
+                <section class="team-section">
+                    <div class="team-card">
+                        <div class="team-image-placeholder">
+                            <img src="https://media-lim1-1.cdn.whatsapp.net/v/t61.24694-24/491882732_1342254370195230_8421735417875817198_n.jpg?ccb=11-4&oh=01_Q5Aa1gHX8VUPLV0wqayAFBDZABINUqNHSSUgnrAWbO0DBR12hg&oe=684EAB16&_nc_sid=5e03e0&_nc_cat=107" alt="Foto de Yuliana Herrera Espinoza">
+                        </div>
+                        <div class="team-text">Yuliana Herrera Espinoza</div>
+                        <div class="team-text">Desarrolladora Principal</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-image-placeholder">
+                            <img src="https://media-lim1-1.cdn.whatsapp.net/v/t61.24694-24/491876056_1043575670666028_7134093312372616942_n.jpg?ccb=11-4&oh=01_Q5Aa1gFJWyUouQpAiNOkmyyP4G0GdwkBcHeN_fa4Xky52u60lQ&oe=684ED811&_nc_sid=5e03e0&_nc_cat=103" alt="Foto de Luis Haurcaya Vigo">
+                        </div>
+                        <div class="team-text">Luis Haurcaya Vigo</div>
+                        <div class="team-text">Diseñador UX/UI</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-image-placeholder">
+                            <img src="https://media-lim1-1.cdn.whatsapp.net/v/t61.24694-24/491839409_1702129217849472_1682663088799483911_n.jpg?ccb=11-4&oh=01_Q5Aa1gEGriv3yIV1BloSs6_2WVAc26_Q6EFV-BpwAerq99N4yg&oe=684EC96C&_nc_sid=5e03e0&_nc_cat=107" alt="Foto de Rodrigo Castillo Campero">
+                        </div>
+                        <div class="team-text">Rodrigo Castillo Campero</div>
+                        <div class="team-text">Analista de Proyectos</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-image-placeholder">
+                            <img src="https://media-lim1-1.cdn.whatsapp.net/v/t61.24694-24/491840895_584437831366736_4271003075732164776_n.jpg?ccb=11-4&oh=01_Q5Aa1gHIQ4liG8ZahXVkLH6KN8GEj1bFL6Z2UGuoo1-g_KVgVA&oe=684EC4F8&_nc_sid=5e03e0&_nc_cat=111" alt="Foto de Yamir Baique Zapata">
+                        </div>
+                        <div class="team-text">Yamir Baique Zapata</div>
+                        <div class="team-text">Especialista en Contenido</div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <script>
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            const selectedPage = document.getElementById(pageId);
+            if (selectedPage) {
+                selectedPage.classList.add('active');
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('inicio');
+        });
+    </script>
+</body>
+</html>
